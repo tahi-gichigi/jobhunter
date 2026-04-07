@@ -32,13 +32,13 @@ export function applyFilters(
     });
   }
 
-  // Sort by date (newest first), with unknown dates treated as recent
+  // Sort by date (newest first), unknown dates pushed to end
   filtered.sort((a, b) => {
-    // Treat unknown dates as very recent (sort to top)
-    if (a.datePosted === "unknown" && b.datePosted === "unknown") return 0;
-    if (a.datePosted === "unknown") return -1;
-    if (b.datePosted === "unknown") return 1;
-
+    const aUnknown = a.datePosted === "unknown";
+    const bUnknown = b.datePosted === "unknown";
+    if (aUnknown && bUnknown) return 0;
+    if (aUnknown) return 1;
+    if (bUnknown) return -1;
     return new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime();
   });
 
