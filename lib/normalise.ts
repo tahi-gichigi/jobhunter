@@ -145,13 +145,15 @@ function extractDate(result: FirecrawlResult): Date | null {
     if (metaDate) return metaDate;
   }
 
-  const text = result.markdown || result.content || result.description || "";
+  // Strip <br> tags that leak through from HTML and break date patterns
+  const rawText = result.markdown || result.content || result.description || "";
+  const text = rawText.replace(/<br\s*\/?>/gi, " ");
 
   // Priority 2: Dates with posting context words
   const contextPatterns = [
     /(?:posted|published|listed|date)\s*:?\s*(\d{4}-\d{2}-\d{2})/i,
     /(?:posted|published|listed|date)\s*:?\s*(\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*(?:\s+\d{4})?)/i,
-    /(?:posted|published|listed)\s*:?\s*(\d+\s+(?:day|hour|week|month)s?\s+ago)/i,
+    /(?:posted|published|listed)\s*:?\s*(\d+\s*(?:d|h|w|m|min|mth|mo|day|hour|week|month)s?\s+ago)/i,
   ];
 
   for (const pattern of contextPatterns) {
@@ -162,10 +164,9 @@ function extractDate(result: FirecrawlResult): Date | null {
     }
   }
 
-  // Priority 3: Standalone relative date (abbreviated or full form)
-  const topContent = text.slice(0, 500);
-  // Match both "3d ago" and "3 days ago" formats
-  const relativeMatch = topContent.match(/(\d+\s*(?:d|h|w|m|day|hour|week|month)s?\s+ago)/i);
+  // Priority 3: Standalone relative date — search full text, date can be buried past nav/promo blocks
+  // Match "3d ago", "3 days ago", "2mths ago", "2mo ago" formats
+  const relativeMatch = text.match(/(\d+\s*(?:d|h|w|m|min|mth|mo|day|hour|week|month)s?\s+ago)/i);
   if (relativeMatch) {
     const parsed = parseJobDate(relativeMatch[1]);
     if (parsed) return parsed;

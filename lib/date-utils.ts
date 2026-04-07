@@ -8,7 +8,7 @@ export function parseJobDate(raw: string | undefined | null): Date | null {
 
   // "X days ago", "X hours ago", "3d ago", "5h ago" (full or abbreviated)
   const relativeMatch = text.match(
-    /(\d+)\s*([mhdw]|minute|hour|day|week|month)s?\s+ago/
+    /(\d+)\s*([mhdw]|min|mth|mo|minute|hour|day|week|month)s?\s+ago/
   );
   if (relativeMatch) {
     const amount = parseInt(relativeMatch[1], 10);
@@ -16,8 +16,12 @@ export function parseJobDate(raw: string | undefined | null): Date | null {
     const now = new Date();
 
     // Map abbreviated units to full names
+    // "m" = month on job boards (posting ages are never in minutes)
     const unitMap: Record<string, string> = {
-      m: "minute",
+      m: "month",
+      mo: "month",
+      mth: "month",
+      min: "minute",
       h: "hour",
       d: "day",
       w: "week",
@@ -70,7 +74,7 @@ export function isWithinRecencyWindow(
 
 // Format a date for display as relative time or short date
 export function formatRelativeDate(dateStr: string): string {
-  if (dateStr === "unknown") return "Recently";
+  if (dateStr === "unknown") return "Date unknown";
 
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return "Recently";

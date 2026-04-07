@@ -1,5 +1,5 @@
 import { JobListing } from "@/types/job";
-import { chatCompletion } from "./openai";
+import { chatCompletion } from "./anthropic";
 
 interface DedupGroup {
   keep: number;

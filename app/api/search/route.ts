@@ -88,11 +88,15 @@ export async function POST() {
       classified = await classifyRemoteScope(deduped);
     }
 
-    // Sort by date, newest first
-    classified.sort(
-      (a, b) =>
-        new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime()
-    );
+    // Sort by date, newest first. Push "unknown" dates to the end.
+    classified.sort((a, b) => {
+      const aUnknown = a.datePosted === "unknown";
+      const bUnknown = b.datePosted === "unknown";
+      if (aUnknown && bUnknown) return 0;
+      if (aUnknown) return 1;
+      if (bUnknown) return -1;
+      return new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime();
+    });
 
     logger.log({
       stage: "complete",

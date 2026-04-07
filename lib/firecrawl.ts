@@ -29,7 +29,15 @@ async function firecrawlSearch(
     sources: [{ type: "web" }],
     scrapeOptions: {
       formats: ["markdown"],
-      onlyMainContent: true, // Skip headers/footers/navigation
+      onlyMainContent: true,
+      // Strip noise that bloats markdown and buries dates:
+      // modals/banners (Remotive paywall), images, boilerplate tags
+      excludeTags: [
+        "nav", "header", "footer", "script", "style", "img", "svg", "picture",
+        "[class*='modal']", "[class*='banner']", "[class*='promo']",
+        "[class*='popup']", "[class*='overlay']",
+      ],
+      removeBase64Images: true,
     },
   };
 
