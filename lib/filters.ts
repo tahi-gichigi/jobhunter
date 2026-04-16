@@ -20,35 +20,27 @@ export function applyFilters(
 ): JobListing[] {
   let filtered = [...jobs];
 
-  // Remote scope filter
-  if (filters.remoteScope === "global") {
-    filtered = filtered.filter(
-      (j) => j.remoteScope === "global" || j.remoteScope === "unknown"
-    );
-  }
-
-  // Source board filter
-  if (filters.sourceBoard) {
-    filtered = filtered.filter((j) => j.sourceBoard === filters.sourceBoard);
-  }
-
   // Date range filter
   if (filters.dateRange) {
     const days = parseInt(filters.dateRange, 10);
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
-    filtered = filtered.filter((j) => new Date(j.datePosted) >= cutoff);
+    filtered = filtered.filter((j) => {
+      // Keep jobs with unknown dates when filtering
+      if (j.datePosted === "unknown") return true;
+      return new Date(j.datePosted) >= cutoff;
+    });
   }
 
-  // Sort
-  if (filters.sortBy === "date") {
-    filtered.sort(
-      (a, b) =>
-        new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime()
-    );
-  } else if (filters.sortBy === "company") {
-    filtered.sort((a, b) => a.company.localeCompare(b.company));
-  }
+  // Sort by date (newest first), unknown dates pushed to end
+  filtered.sort((a, b) => {
+    const aUnknown = a.datePosted === "unknown";
+    const bUnknown = b.datePosted === "unknown";
+    if (aUnknown && bUnknown) return 0;
+    if (aUnknown) return 1;
+    if (bUnknown) return -1;
+    return new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime();
+  });
 
   return filtered;
 }

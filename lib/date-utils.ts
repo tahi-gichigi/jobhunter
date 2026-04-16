@@ -6,15 +6,29 @@ export function parseJobDate(raw: string | undefined | null): Date | null {
 
   const text = raw.trim().toLowerCase();
 
-  // "X days ago", "X hours ago", "X minutes ago"
+  // "X days ago", "X hours ago", "3d ago", "5h ago" (full or abbreviated)
   const relativeMatch = text.match(
-    /(\d+)\s+(minute|hour|day|week|month)s?\s+ago/
+    /(\d+)\s*([mhdw]|min|mth|mo|minute|hour|day|week|month)s?\s+ago/
   );
   if (relativeMatch) {
     const amount = parseInt(relativeMatch[1], 10);
     const unit = relativeMatch[2];
     const now = new Date();
-    switch (unit) {
+
+    // Map abbreviated units to full names
+    // "m" = month on job boards (posting ages are never in minutes)
+    const unitMap: Record<string, string> = {
+      m: "month",
+      mo: "month",
+      mth: "month",
+      min: "minute",
+      h: "hour",
+      d: "day",
+      w: "week",
+    };
+    const normalizedUnit = unitMap[unit] || unit;
+
+    switch (normalizedUnit) {
       case "minute":
         now.setMinutes(now.getMinutes() - amount);
         return now;
@@ -60,8 +74,10 @@ export function isWithinRecencyWindow(
 
 // Format a date for display as relative time or short date
 export function formatRelativeDate(dateStr: string): string {
+  if (dateStr === "unknown") return "Date unknown";
+
   const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "Unknown";
+  if (isNaN(date.getTime())) return "Recently";
 
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();

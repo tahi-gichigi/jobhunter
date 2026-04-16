@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__notion__notion-search",
+      "mcp__notion__notion-fetch",
+      "Bash(vercel env add:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "WebFetch(domain:docs.firecrawl.dev)",
+      "mcp__firecrawl__firecrawl_search",
+      "Bash(python3:*)",
+      "Bash(git rm:*)",
+      "Bash(vercel inspect:*)",
+      "Bash(vercel logs:*)",
+      "Bash(vercel ls:*)",
+      "Bash(vercel:*)"
+    ]
+  }
+}

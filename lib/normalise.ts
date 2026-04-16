@@ -145,13 +145,15 @@ function extractDate(result: FirecrawlResult): Date | null {
     if (metaDate) return metaDate;
   }
 
-  const text = result.markdown || result.content || result.description || "";
+  // Strip <br> tags that leak through from HTML and break date patterns
+  const rawText = result.markdown || result.content || result.description || "";
+  const text = rawText.replace(/<br\s*\/?>/gi, " ");
 
   // Priority 2: Dates with posting context words
   const contextPatterns = [
     /(?:posted|published|listed|date)\s*:?\s*(\d{4}-\d{2}-\d{2})/i,
     /(?:posted|published|listed|date)\s*:?\s*(\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*(?:\s+\d{4})?)/i,
-    /(?:posted|published|listed)\s*:?\s*(\d+\s+(?:day|hour|week|month)s?\s+ago)/i,
+    /(?:posted|published|listed)\s*:?\s*(\d+\s*(?:d|h|w|m|min|mth|mo|day|hour|week|month)s?\s+ago)/i,
   ];
 
   for (const pattern of contextPatterns) {
@@ -162,9 +164,9 @@ function extractDate(result: FirecrawlResult): Date | null {
     }
   }
 
-  // Priority 3: Standalone relative date near the top (first 500 chars)
-  const topContent = text.slice(0, 500);
-  const relativeMatch = topContent.match(/(\d+\s+(?:day|hour|week|month)s?\s+ago)/i);
+  // Priority 3: Standalone relative date — search full text, date can be buried past nav/promo blocks
+  // Match "3d ago", "3 days ago", "2mths ago", "2mo ago" formats
+  const relativeMatch = text.match(/(\d+\s*(?:d|h|w|m|min|mth|mo|day|hour|week|month)s?\s+ago)/i);
   if (relativeMatch) {
     const parsed = parseJobDate(relativeMatch[1]);
     if (parsed) return parsed;
@@ -201,6 +203,12 @@ export function normaliseResult(
 ): { job: JobListing | null; dropReason: string | null } {
   if (!result.url) return { job: null, dropReason: "no_url" };
 
+  // Debug: log markdown length
+  if (result.markdown || result.content) {
+    const len = (result.markdown || result.content || "").length;
+    console.log(`[${boardName}] Markdown/content length: ${len} chars for ${result.url.split("/").pop()}`);
+  }
+
   const junkReason = isJunkResult(result);
   if (junkReason) return { job: null, dropReason: junkReason };
 
@@ -212,9 +220,7 @@ export function normaliseResult(
 
   if (layer === "curated") {
     // Curated boards are trusted sources. If we can't parse a date,
-    // use today as the posting date rather than dropping the result.
-    const effectiveDate = date ?? new Date();
-
+    // mark as "unknown" rather than dropping the result.
     if (date && !isWithinRecencyWindow(date)) {
       return { job: null, dropReason: "too_old" };
     }
@@ -226,7 +232,7 @@ export function normaliseResult(
         company: extractCompany(result),
         location: "Remote",
         salary: extractSalary(result),
-        datePosted: effectiveDate.toISOString().split("T")[0],
+        datePosted: date ? date.toISOString().split("T")[0] : "unknown",
         sourceBoard: boardName,
         sourceUrl: result.url,
         description: result.description || "",

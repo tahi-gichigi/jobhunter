@@ -21,56 +21,9 @@ export default function FilterBar({
   filteredCount,
 }: FilterBarProps) {
   return (
-    <div className="mb-6 space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
-          {filteredCount} of {totalCount} jobs
-        </p>
-        <div className="flex items-center gap-1 text-sm">
-          <label className="text-gray-500">Sort:</label>
-          <select
-            value={filters.sortBy}
-            onChange={(e) =>
-              onFilterChange("sortBy", e.target.value as "date" | "company")
-            }
-            className="text-sm border border-gray-200 rounded px-2 py-1"
-          >
-            <option value="date">Newest</option>
-            <option value="company">Company A-Z</option>
-          </select>
-        </div>
-      </div>
-
+    <div className="mb-6">
       <div className="flex flex-wrap gap-2">
-        {/* Remote scope toggle */}
-        <select
-          value={filters.remoteScope}
-          onChange={(e) =>
-            onFilterChange("remoteScope", e.target.value as "global" | "all")
-          }
-          className="text-sm border border-gray-200 rounded px-2 py-1"
-        >
-          <option value="global">Global remote</option>
-          <option value="all">All remote</option>
-        </select>
-
-        {/* Source board filter */}
-        <select
-          value={filters.sourceBoard ?? ""}
-          onChange={(e) =>
-            onFilterChange("sourceBoard", e.target.value || null)
-          }
-          className="text-sm border border-gray-200 rounded px-2 py-1"
-        >
-          <option value="">All boards</option>
-          {boards.map((b) => (
-            <option key={b} value={b}>
-              {b}
-            </option>
-          ))}
-        </select>
-
-        {/* Date range */}
+        {/* Date range filter */}
         <select
           value={filters.dateRange ?? ""}
           onChange={(e) =>
