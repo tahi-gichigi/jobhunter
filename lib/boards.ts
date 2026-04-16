@@ -34,6 +34,36 @@ export const BOARDS: BoardConfig[] = [
     siteQuery: "site:jobs.lisboaux.com",
     layer: "curated",
   },
+  {
+    name: "UXR Hunt",
+    // UX research-specific board, curated daily
+    siteQuery: "site:uxrhunt.com",
+    layer: "curated",
+  },
+  {
+    name: "UI/UX Jobs Board",
+    // Design jobs listings scoped to the /design-jobs path
+    siteQuery: "site:uiuxjobsboard.com/design-jobs",
+    layer: "curated",
+  },
+  {
+    name: "Remote Rocketship",
+    // UX researcher jobs scoped to the relevant path, scrapes company career pages
+    siteQuery: "site:remoterocketship.com/us/jobs/ux-researcher",
+    layer: "curated",
+  },
+  {
+    name: "Built In",
+    // Tech-focused remote design/UX jobs section
+    siteQuery: "site:builtin.com/jobs/remote/design-ux",
+    layer: "curated",
+  },
+  {
+    name: "Uxcel",
+    // UX-specific job board, growing listings
+    siteQuery: "site:app.uxcel.com/jobs",
+    layer: "curated",
+  },
 ];
 
 // Build a Firecrawl search query for a curated board

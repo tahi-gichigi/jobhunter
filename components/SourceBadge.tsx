@@ -7,6 +7,11 @@ const BOARD_COLORS: Record<string, { bg: string; text: string }> = {
   "Lisbon UX": { bg: "bg-orange-100", text: "text-orange-700" },
   "We Work Remotely": { bg: "bg-green-100", text: "text-green-700" },
   Dribbble: { bg: "bg-pink-100", text: "text-pink-700" },
+  "UXR Hunt": { bg: "bg-indigo-100", text: "text-indigo-700" },
+  "UI/UX Jobs Board": { bg: "bg-teal-100", text: "text-teal-700" },
+  "Remote Rocketship": { bg: "bg-red-100", text: "text-red-700" },
+  "Built In": { bg: "bg-yellow-100", text: "text-yellow-700" },
+  Uxcel: { bg: "bg-cyan-100", text: "text-cyan-700" },
   Discovery: { bg: "bg-gray-100", text: "text-gray-600" },
 };
 
